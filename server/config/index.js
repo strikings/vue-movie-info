@@ -14,5 +14,12 @@ module.exports = {
         paranoid: true
       }
     }
+  },
+  // token签名和有效期
+  token: {
+    secretOrPrivateKey: 'movie',
+    options: {
+      expiresIn: '24h'
+    }
   }
 }

@@ -12,7 +12,7 @@ const { sequelize } = require('./models')
 require('./router')(app)
 
 // 监听端口
-sequelize.sync()
+sequelize.sync() 
   .then(() => {
     console.log('Connection has been established successfully.')
     app.listen(3000, () => console.log(`Server has been started on port 3000`))

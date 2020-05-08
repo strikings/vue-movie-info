@@ -1,12 +1,57 @@
 const { User } = require('../models')
 
+// JWT第一步：引入config
+const config = require('../config')
+
+// JWT第二步：引入JWT
+const Jwt = require('jsonwebtoken')
+
+// JWT第三步：自定义函数
+function tokenSign(id, email) {
+  try {
+    return Jwt.sign({ id, email }, config.token.secretOrPrivateKey, config.token.options)
+  } catch (error) {
+    throw (error)
+  }
+}
+
 module.exports = {
+
+  // 登录
+  async login(req, res) {
+    try {
+      // findOne 查找数据库表内数据，判断该邮箱用户是否已经注册（先注册才能登录）
+      const user = await User.findOne({
+        where: {
+          email: req.body.email
+        }
+      })
+      // 密码对比：加密后的密码是否与数据库中的密码相同；方法定义在User.js中
+      let isValidPassword = user.comparePassword(req.body.password)
+      if (isValidPassword) {
+        res.send({
+          user: user.toJSON(),
+          // JWT第四步：调用自定义函数
+          token: tokenSign(user)
+        })
+      }
+    } catch (error) {
+      res.status(403).send({
+        code: 403,
+        error: '用户名或密码错误'
+      })
+    }
+  },
+
+
   // 注册
   async register(req, res) {
     try {
       const user = await User.create(req.body)
       res.status(201).send({
-        user
+        user,
+        // JWT第四步：调用自定义函数
+        token: tokenSign(user)
       })
     } catch (error) {
       res.status(400).send({
@@ -15,7 +60,7 @@ module.exports = {
       })
     }
   },
-  // 根据id查询用户信息
+  // 通过主键来查询一条记录：await User.findByPk(req.params.id)
   async getUserById(req, res) {
     try {
       const user = await User.findByPk(req.params.id)

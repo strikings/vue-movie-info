@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
 
 /**
  * 读取当前目录：除index.js文件之外，循环遍历models文件中的所有文件，进行导出操作；然后将model存放在db中，进行统一导出
- */
+*/
 fs.readdirSync(__dirname)
   .filter(file => file !== 'index.js')
   .forEach(file => {
